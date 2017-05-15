@@ -214,6 +214,7 @@ public boolean sendEmail(String toEmail, String subject,String content) {
 		System.out.println("Email send successfully");
 		return true;
 	} catch (Exception e) {
+		e.printStackTrace();
 		return false;
 	}
 }
