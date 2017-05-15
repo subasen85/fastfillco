@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nurds.fastfillco.ResponseObject;
@@ -74,6 +75,7 @@ public class DoctorMedicine extends ResponseObject implements Serializable {
   
   private String couponInsurance;
   
+  @Transient
   private String medicalRepName;
   
   
