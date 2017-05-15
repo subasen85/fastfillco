@@ -10,7 +10,7 @@ public class Response {
 	
 	private long str;
 	
-	
+	private String message;
 
 	public long getStr() {
 		return str;
@@ -42,6 +42,14 @@ public class Response {
 
 	public void setObject(ResponseObject object) {
 		this.resObject = object;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 	
 	

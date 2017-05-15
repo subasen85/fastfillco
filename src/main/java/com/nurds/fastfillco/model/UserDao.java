@@ -1,7 +1,14 @@
 package com.nurds.fastfillco.model;
 
 import java.util.List;
+import java.util.Properties;
 
+import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -103,23 +110,23 @@ public class UserDao {
    */
   public Doctor login(String username,String password) {
     return (Doctor) entityManager.createQuery(
-        "from Doctor where username = :username and password = :password")
-        .setParameter("username", username)
+        "from Doctor where LOWER(username) = :username and password = :password")
+        .setParameter("username", username.toLowerCase())
         .setParameter("password", password)
         .getSingleResult();
   }
 
   public MedicalRep loginMr(String username,String password) {
 	    return (MedicalRep) entityManager.createQuery(
-	        "from MedicalRep where username = :username and password = :password")
-	        .setParameter("username", username)
+	        "from MedicalRep where LOWER(username) = :username and password = :password")
+	        .setParameter("username", username.toLowerCase())
 	        .setParameter("password", password)
 	        .getSingleResult();
 	  }
   public Doctor getDoctor(String username) {
 	    return (Doctor) entityManager.createQuery(
-	        "from Doctor where username = :username ")
-	        .setParameter("username", username)
+	        "from Doctor where LOWER(username) = :username ")
+	        .setParameter("username", username.toLowerCase())
 	        .getSingleResult();
 	  }
   
@@ -133,8 +140,8 @@ public class UserDao {
 
   public MedicalRep getMr(String username) {
 	    return (MedicalRep) entityManager.createQuery(
-	        "from MedicalRep where username = :username ")
-	        .setParameter("username", username)
+	        "from MedicalRep where LOWER(username) = :username ")
+	        .setParameter("username", username.toLowerCase())
 	        .getSingleResult();
 	  }
 	  
@@ -147,5 +154,68 @@ public class UserDao {
   // setup on DatabaseConfig class.
   @PersistenceContext
   private EntityManager entityManager;
+
+
+public String passwordReset(String username, String newPassword, boolean isDoctor) {
+	if(isDoctor){
+		Doctor doctor= (Doctor) entityManager.createQuery(
+		        "from Doctor where LOWER(username) = :username")
+		        .setParameter("username", username.toLowerCase())
+		        .getSingleResult();
+		doctor.setPassword(newPassword);
+		if(entityManager.merge(doctor)!=null){
+			if(doctor.getLastName() != null){
+				return doctor.getFirstName()+" "+doctor.getLastName();	
+			}
+			return doctor.getFirstName();
+		}
+	}else{
+		MedicalRep medicalRep = (MedicalRep) entityManager.createQuery(
+		        "from MedicalRep where LOWER(username) = :username")
+		        .setParameter("username", username.toLowerCase())
+		        .getSingleResult();
+		medicalRep.setPassword(newPassword);
+		if(entityManager.merge(medicalRep)!=null){
+			if(medicalRep.getLastName() != null){
+				return medicalRep.getFirstName()+" "+medicalRep.getLastName();	
+			}
+			return medicalRep.getFirstName();
+		}
+	}
+	return null;
+}
+
+public boolean sendEmail(String toEmail, String subject,String content) {
+	System.out.println("toEmail="+toEmail+";subject="+subject+";content="+content);
+	Properties props = new Properties();
+	props.put("mail.smtp.auth", "true");
+	props.put("mail.smtp.starttls.enable", "true");
+	props.put("mail.smtp.host", "smtp.gmail.com");
+	props.put("mail.smtp.port", "587");
+	final String username = "shuaib2u@gmail.com";
+	final String password = "ShanibZain7.";
+	Session session = Session.getInstance(props,
+	  new javax.mail.Authenticator() {
+		protected PasswordAuthentication getPasswordAuthentication() {
+			return new PasswordAuthentication(username, password);
+		}
+	  });
+
+	try {
+
+		Message message = new MimeMessage(session);
+		message.setFrom(new InternetAddress(username));
+		message.setRecipients(Message.RecipientType.TO,
+			InternetAddress.parse(toEmail));
+		message.setSubject(subject);
+		message.setText(content);
+
+		Transport.send(message);
+		System.out.println("Email send successfully");
+		return true;
+	} catch (Exception e) {
+		return false;
+	}
+}
   
 } // class UserDao

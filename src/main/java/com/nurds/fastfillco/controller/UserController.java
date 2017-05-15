@@ -1,5 +1,7 @@
 package com.nurds.fastfillco.controller;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +60,9 @@ public class UserController {
 			userDao.createLocation(loc);
 			locs.add(loc);
 			doctor.setLocations(locs);
+			if(doctor.getUsername()!=null){
+				doctor.setUsername(doctor.getUsername().toLowerCase());				
+			}
 			userDao.create(doctor);
 		}
 		catch (Exception ex) {
@@ -342,7 +347,16 @@ public class UserController {
 			res.setError("Login Failed");
 			return res;
 		}
-		System.out.println(docList);
+		for(DoctorMedicine doctorMedicine:docList){
+			MedicalRep mr2=doctorMedicine.getMr();
+			if(mr2!=null){
+				if(mr2.getFirstName()!=null && mr2.getLastName()!=null){
+					doctorMedicine.setMedicalRepName(mr2.getFirstName()+" "+mr2.getLastName());		
+				}else if(mr2.getFirstName()!=null){
+					doctorMedicine.setMedicalRepName(mr2.getFirstName());
+				} 
+			}
+		}
 		DoctorMedcineResponse resp = new DoctorMedcineResponse();
 		resp.setMedicines(docList);
 		res.setResponseCode("200");
@@ -723,5 +737,44 @@ public class UserController {
 	docMedicineDao.insertSubClass(m);    
 	}
 
-
+	@RequestMapping(value="/forgotPassword")
+	@ResponseBody
+	public Response forgotPasswordDoctor(String username,boolean isDoctor) {
+		Response res = new Response();
+		String  user = null;
+		SecureRandom random = new SecureRandom();
+		String newPassword=new BigInteger(50, random).toString(32);
+		try {
+			user = userDao.passwordReset(username,newPassword, isDoctor);
+			if(user == null){
+				res.setResponseCode("500");
+				res.setError("Problem in reset Password");
+				return res;
+			}
+		}
+		catch (Exception ex) {
+			System.out.println(ex);
+			res.setResponseCode("500");
+			res.setError("Problem in reset Password");
+			return res;
+		}
+		try {
+			String content = "Hi "+user+", your fastfillco Password has been reset,you can use this password='"+newPassword+"' to login.";
+			boolean isPasswordMailSend = userDao.sendEmail(username,"Password Reset,", content);
+			if(!isPasswordMailSend){
+				res.setResponseCode("500");
+				res.setError("Problem in sending mail");
+				return res;
+			}
+		}
+		catch (Exception ex) {
+			System.out.println(ex);
+			res.setResponseCode("500");
+			res.setError("Problem in reset Password");
+			return res;
+		}
+		res.setResponseCode("200");
+		res.setMessage("Your password reset mail send successfully!");
+		return res;
+	}
 } 

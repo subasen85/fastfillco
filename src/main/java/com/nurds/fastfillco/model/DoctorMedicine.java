@@ -61,7 +61,7 @@ public class DoctorMedicine extends ResponseObject implements Serializable {
   private String medicinePrice;
   
   @JsonIgnore
-  @ManyToOne (fetch = FetchType.LAZY)
+  @ManyToOne (fetch = FetchType.EAGER)
   private MedicalRep mr;
   
   private String couponsExpiryDate;
@@ -74,6 +74,7 @@ public class DoctorMedicine extends ResponseObject implements Serializable {
   
   private String couponInsurance;
   
+  private String medicalRepName;
   
   
   public String getCouponInsurance() {
@@ -82,6 +83,14 @@ public class DoctorMedicine extends ResponseObject implements Serializable {
 
 public void setCouponInsurance(String couponInsurance) {
 	this.couponInsurance = couponInsurance;
+}
+
+public String getMedicalRepName() {
+	return medicalRepName;
+}
+
+public void setMedicalRepName(String medicalrepName) {
+	this.medicalRepName = medicalrepName;
 }
 
 @JsonIgnore
@@ -316,7 +325,7 @@ public String toString() {
 			+ numVoucher + ", voucherInsurance=" + voucherInsurance
 			+ ", voucherExpiryDate=" + voucherExpiryDate
 			+ ", couponsExpiryDate=" + couponsExpiryDate + ", doctor=" + doctor
-			+ "]";
+			 + ", mr=" + mr+ "]";
 }
 
 
