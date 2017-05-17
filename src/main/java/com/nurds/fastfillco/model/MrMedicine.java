@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nurds.fastfillco.ResponseObject;
@@ -50,7 +51,8 @@ private int voucherPrice;
 
 private int couponPrice;
 
-
+@Transient
+private String medicalRepName;
 
 public int getCouponPrice() {
 	return couponPrice;
@@ -65,7 +67,7 @@ public void setVoucherPrice(int voucherPrice) {
 }
 
 @JsonIgnore
-@ManyToOne (fetch = FetchType.LAZY)
+@ManyToOne (fetch = FetchType.EAGER)
 private MedicalRep mr;
 
 private String couponsExpiryDate;
@@ -216,6 +218,14 @@ public Doctor getDoctor() {
 
 public void setDoctor(Doctor doctor) {
 	this.doctor = doctor;
+}
+
+public String getMedicalRepName() {
+	return medicalRepName;
+}
+
+public void setMedicalRepName(String medicalRepName) {
+	this.medicalRepName = medicalRepName;
 }
 
 @Override

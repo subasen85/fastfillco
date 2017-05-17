@@ -401,6 +401,16 @@ public class UserController {
 			res.setError("Login Failed");
 			return res;
 		}
+		for(MrMedicine mrMedicine:docList){
+			MedicalRep mr = mrMedicine.getMr();
+			if(mr!=null){
+				if(mr.getFirstName()!=null && mr.getLastName()!=null){
+					mrMedicine.setMedicalRepName(mr.getFirstName()+" "+mr.getLastName());		
+				}else if(mr.getFirstName()!=null){
+					mrMedicine.setMedicalRepName(mr.getFirstName());
+				} 
+			}
+		}
 		MrMedcineResponse resp = new MrMedcineResponse();
 		resp.setMedicines(docList);
 		res.setResponseCode("200");
