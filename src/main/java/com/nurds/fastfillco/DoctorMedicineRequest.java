@@ -2,7 +2,7 @@ package com.nurds.fastfillco;
 
 
 public class DoctorMedicineRequest {
-
+	private long id;
 	private long location;
 	private String medicineName;
 	  
@@ -206,6 +206,14 @@ public class DoctorMedicineRequest {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	@Override

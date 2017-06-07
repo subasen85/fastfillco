@@ -57,6 +57,18 @@ public class UserDao {
 		        .getSingleResult();
   }
  
+  public boolean isMrRepExist(String username) {
+		Long count = (Long) entityManager.createQuery(
+		        "SELECT  COUNT (*) from MedicalRep where LOWER(username) = :username")
+		        .setParameter("username", username)
+		        .getSingleResult();
+		System.err.println("username="+username+"&count="+count);
+		if(count>0){
+			return true;
+		}
+		return false;
+  }
+  
   public void createMr(MedicalRep mr) {
 	   entityManager.persist(mr);
 	    return;
@@ -185,6 +197,34 @@ public String passwordReset(String username, String newPassword, boolean isDocto
 	return null;
 }
 
+/*public boolean sendEmail(String toEmail, String subject,String content) {
+System.out.println("toEmail="+toEmail+";subject="+subject+";content="+content);
+SendGrid sendgrid = new SendGrid(env.getProperty("sendgrid_apikey"));
+Email from = new Email("physician@fastfillco.com");
+Email to = new Email(toEmail);
+Content msgContent = new Content("text/plain", content);
+Mail mail = new Mail(from, subject, to, msgContent);
+Request request = new Request();
+request.setMethod(Method.POST);
+request.setEndpoint("mail/send");
+try {
+	request.setBody(mail.build());
+	Response response = sendgrid.api(request);
+	if(response!=null && response.getStatusCode()==200){
+		return true;
+	}
+} catch (IOException e1) {
+	e1.printStackTrace();
+	return false;
+}
+return false;
+<dependency>
+    <groupId>com.sendgrid</groupId>
+    <artifactId>sendgrid-java</artifactId>
+    <version>4.0.1</version>
+</dependency>
+}*/
+
 public boolean sendEmail(String toEmail, String subject,String content) {
 	System.out.println("toEmail="+toEmail+";subject="+subject+";content="+content);
 	Properties props = new Properties();
@@ -192,8 +232,8 @@ public boolean sendEmail(String toEmail, String subject,String content) {
 	props.put("mail.smtp.starttls.enable", "true");
 	props.put("mail.smtp.host", "smtp.gmail.com");
 	props.put("mail.smtp.port", "587");
-	final String username = "shuaib2u@gmail.com";
-	final String password = "ShanibZain7.";
+	final String username = "gmailusername@gmail.com";
+	final String password = "gmailpassword";
 	Session session = Session.getInstance(props,
 	  new javax.mail.Authenticator() {
 		protected PasswordAuthentication getPasswordAuthentication() {

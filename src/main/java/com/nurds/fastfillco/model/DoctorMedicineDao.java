@@ -8,6 +8,8 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;
 
+import com.nurds.fastfillco.DoctorMedicineRequest;
+
 /**
  * This class is used to access data for the User entity.
  * Repository annotation allows the component scanning support to find and 
@@ -187,5 +189,49 @@ public class DoctorMedicineDao {
   // setup on DatabaseConfig class.
   @PersistenceContext
   private EntityManager entityManager;
+
+
+	public MrMedicine updateMrMedicine(DoctorMedicineRequest medicineReq) {
+		MrMedicine medicine = getMrMedicineDetail(medicineReq.getId());
+		if(medicine == null){
+			return null;
+		}
+		if(medicineReq.getCouponsExpiryDate()!=null){
+			medicine.setCouponsExpiryDate(medicineReq.getCouponsExpiryDate());
+		}
+		if(medicineReq.getExpiryDate()!=null){
+			medicine.setExpiryDate(medicineReq.getExpiryDate());
+		}
+		if(medicineReq.getmClass()!=null){
+			medicine.setmClass(medicineReq.getmClass());
+		}
+		if(medicineReq.getMedicineName()!=null){
+			medicine.setMedicineName(medicineReq.getMedicineName());
+		}
+		if(medicineReq.getNumPillPerBox()!=null){
+			medicine.setNumPillPerBox(medicineReq.getNumPillPerBox());
+		}
+		if(medicineReq.getSubClass()!=null){
+			medicine.setSubClass(medicineReq.getSubClass());
+		}
+		if(medicineReq.getVoucherExpiryDate()!=null){
+			medicine.setVoucherExpiryDate(medicineReq.getVoucherExpiryDate());
+		}
+		if(medicineReq.getVoucherInsurance()!=null){
+			medicine.setVoucherInsurance(medicineReq.getVoucherInsurance());
+		}
+		if(medicineReq.getDosage()!=null){
+			medicine.setDosage(medicineReq.getDosage());
+		}
+		if(medicine.getCouponInsurance()!=null){
+			medicine.setCouponInsurance(medicine.getCouponInsurance());
+		}
+		if(medicine.getVoucherPrice()!=null){
+			medicine.setVoucherPrice(medicineReq.getVoucherPrice());
+		}
+		medicine = entityManager.merge(medicine);
+		return medicine;
+	}
+
   
 } // class UserDao

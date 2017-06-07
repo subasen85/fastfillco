@@ -239,7 +239,12 @@ public class UserController {
 	@ResponseBody Response registerMR(@RequestBody MedicalRep mrRep) {
 		Response res = new Response();
 		try {
-			
+			boolean isUserExist = userDao.isMrRepExist(mrRep.getUsername());
+			if(isUserExist){
+				res.setResponseCode("500");
+				res.setError("username already exist");
+				return res;
+			}
 			userDao.createMr(mrRep);
 		}
 		catch (Exception ex) {
@@ -711,11 +716,33 @@ public class UserController {
 			return res;
 		}
 		res.setResponseCode("200");
-		ResponseString str = new ResponseString();
-		str.setResponse("Medicine created successfully");
 		return res;
 	}
-	 
+	
+	//@RequestMapping(value="/mrMedicine/update")
+	@ResponseBody
+	public Response updateMrMedicine(@RequestBody DoctorMedicineRequest medicineReq) {
+		Response res = new Response();
+		MrMedicine medicine = null;
+		try {
+			medicine = docMedicineDao.updateMrMedicine(medicineReq);
+		}
+		catch (Exception ex) {
+			System.out.println(ex);
+			res.setResponseCode("500");
+			res.setError("Problem in update MrMedicine");
+			return res;
+		}
+		if(medicine == null){
+			res.setResponseCode("500");
+			res.setError("mrMedicine Id not exist");
+			return res;
+		}
+		res.setResponseCode("200");
+		res.setObject(medicine);
+		return res;
+	}
+	
 	@RequestMapping(value="/getmastermedication")
 	@ResponseBody
 	public List<MasterMedication> getMasterMedication() {
