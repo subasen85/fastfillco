@@ -1,19 +1,23 @@
 package com.nurds.fastfillco.model;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 
-import javax.mail.Message;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
+
+import com.sendgrid.Content;
+import com.sendgrid.Email;
+import com.sendgrid.Mail;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
 
 /**
  * This class is used to access data for the User entity.
@@ -32,7 +36,8 @@ public class UserDao {
   // ------------------------
   // PUBLIC METHODS
   // ------------------------
-  
+	@Autowired
+	private Environment env;
   /**
    * Save the user in the database.
    */
@@ -197,66 +202,29 @@ public String passwordReset(String username, String newPassword, boolean isDocto
 	return null;
 }
 
-/*public boolean sendEmail(String toEmail, String subject,String content) {
-System.out.println("toEmail="+toEmail+";subject="+subject+";content="+content);
-SendGrid sendgrid = new SendGrid(env.getProperty("sendgrid_apikey"));
-Email from = new Email("physician@fastfillco.com");
-Email to = new Email(toEmail);
-Content msgContent = new Content("text/plain", content);
-Mail mail = new Mail(from, subject, to, msgContent);
-Request request = new Request();
-request.setMethod(Method.POST);
-request.setEndpoint("mail/send");
-try {
-	request.setBody(mail.build());
-	Response response = sendgrid.api(request);
-	if(response!=null && response.getStatusCode()==200){
-		return true;
-	}
-} catch (IOException e1) {
-	e1.printStackTrace();
-	return false;
-}
-return false;
-<dependency>
-    <groupId>com.sendgrid</groupId>
-    <artifactId>sendgrid-java</artifactId>
-    <version>4.0.1</version>
-</dependency>
-}*/
-
-public boolean sendEmail(String toEmail, String subject,String content) {
-	System.out.println("toEmail="+toEmail+";subject="+subject+";content="+content);
-	Properties props = new Properties();
-	props.put("mail.smtp.auth", "true");
-	props.put("mail.smtp.starttls.enable", "true");
-	props.put("mail.smtp.host", "smtp.gmail.com");
-	props.put("mail.smtp.port", "587");
-	final String username = "gmailusername@gmail.com";
-	final String password = "gmailpassword";
-	Session session = Session.getInstance(props,
-	  new javax.mail.Authenticator() {
-		protected PasswordAuthentication getPasswordAuthentication() {
-			return new PasswordAuthentication(username, password);
+	public boolean sendEmail(String toEmail, String subject,String content) {
+		System.out.println("toEmail="+toEmail+";subject="+subject+";content="+content);
+		String sendgrid_apikey = env.getProperty("sendgrid_apikey");
+		SendGrid sendgrid = new SendGrid(sendgrid_apikey);
+		Email from = new Email("fastfillco@fastfillco.com");
+		Email to = new Email(toEmail);
+		Content msgContent = new Content("text/plain", content);
+		Mail mail = new Mail(from, subject, to, msgContent);
+		Request request = new Request();
+		request.setMethod(Method.POST);
+		request.setEndpoint("mail/send");
+		try {
+			request.setBody(mail.build());
+			Response response = sendgrid.api(request);
+			System.out.println(response.getStatusCode());
+			if(response!=null && response.getStatusCode()>=200 && response.getStatusCode()<300){
+				return true;
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return false;
 		}
-	  });
-
-	try {
-
-		Message message = new MimeMessage(session);
-		message.setFrom(new InternetAddress(username));
-		message.setRecipients(Message.RecipientType.TO,
-			InternetAddress.parse(toEmail));
-		message.setSubject(subject);
-		message.setText(content);
-
-		Transport.send(message);
-		System.out.println("Email send successfully");
-		return true;
-	} catch (Exception e) {
-		e.printStackTrace();
 		return false;
 	}
-}
-  
+
 } // class UserDao
