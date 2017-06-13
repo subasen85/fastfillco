@@ -233,5 +233,32 @@ public class DoctorMedicineDao {
 		return medicine;
 	}
 
+	public MrMedicine isMrSourceExist(MrMedicine mrMedicine) {
+		MrMedicine mrMedicineDb = (MrMedicine) entityManager.createQuery(
+		        "from MrMedicine where medicinename = :medicinename and expirydate = :expirydate and mclass = :mclass and subClass = :subClass")
+				.setParameter("medicinename", mrMedicine.getMedicineName())
+				.setParameter("expirydate", mrMedicine.getExpiryDate())
+				.setParameter("mclass", mrMedicine.getmClass())
+				.setParameter("subClass", mrMedicine.getSubClass())
+		        .getSingleResult();
+		if(mrMedicineDb != null){
+			return mrMedicineDb;
+		}
+		return null;
+	}
+
+	public DoctorMedicine isDoctorMedicineExist(String medicineName, String doctor, String expirydate) {
+		DoctorMedicine doctorMedicine = (DoctorMedicine) entityManager.createQuery(
+		        "from medicine where doctor_username = :doctorusername and medicinename = :medicinename and expirydate = :expirydate")
+				.setParameter("doctorusername", doctor)
+				.setParameter("medicinename", medicineName)
+				.setParameter("expirydate", expirydate)
+		        .getSingleResult();
+		if(doctorMedicine != null){
+			return doctorMedicine;
+		}
+		return null;
+	}
+
   
 } // class UserDao

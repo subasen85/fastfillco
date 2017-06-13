@@ -547,8 +547,23 @@ public class UserController {
 		Doctor docObj = userDao.getDoctor(doctor);
 		Location location = userDao.getLocation(loc);
 		try {
-			
 			mrMedicine = docMedicineDao.getMrMedicineDetail(id);
+			doc  = docMedicineDao.isDoctorMedicineExist(mrMedicine.getMedicineName(),doctor,mrMedicine.getExpiryDate());
+			if(doc != null){
+				doc.setId(doc.getId());
+				if(boxNum!=null){
+					doc.setNumOfBoxes(String.valueOf((Integer.parseInt(boxNum)+Integer.parseInt(doc.getNumOfBoxes()))));
+				}
+				if(voucherNum!=null){
+					doc.setNumVoucher(String.valueOf((Integer.parseInt(voucherNum)+Integer.parseInt(doc.getNumVoucher()))));
+				}
+				if(couponNum!=null){
+					doc.setNumCoupons(String.valueOf((Integer.parseInt(voucherNum)+Integer.parseInt(doc.getNumCoupons()))));
+				}
+				docMedicineDao.updateMedicineDetails(doc);
+				res.setResponseCode("200");
+				return res;
+			}
 			doc = new DoctorMedicine();
 			doc.setMedicineName(mrMedicine.getMedicineName());
 			doc.setDosage(mrMedicine.getDosage());
@@ -706,7 +721,16 @@ public class UserController {
 		medicine.setVoucherPrice(medicineReq.getVoucherPrice());
 		Response res = new Response();
 		try {
-			
+			MrMedicine isMrSourceExist  = docMedicineDao.isMrSourceExist(medicine);
+			if(isMrSourceExist != null){
+				medicineReq.setId(isMrSourceExist.getId());
+				if(medicine.getNumPillPerBox()!=null){
+					medicineReq.setNumPillPerBox(isMrSourceExist.getNumPillPerBox()+medicine.getNumPillPerBox());
+				}
+				updateMrMedicine(medicineReq);
+				res.setResponseCode("200");
+				return res;
+			}
 			docMedicineDao.createMrMedicine(medicine);
 		}
 		catch (Exception ex) {
@@ -719,7 +743,7 @@ public class UserController {
 		return res;
 	}
 	
-	//@RequestMapping(value="/mrMedicine/update")
+	@RequestMapping(value="/mrMedicine/update")
 	@ResponseBody
 	public Response updateMrMedicine(@RequestBody DoctorMedicineRequest medicineReq) {
 		Response res = new Response();
