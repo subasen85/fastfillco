@@ -234,27 +234,45 @@ public class DoctorMedicineDao {
 	}
 
 	public MrMedicine isMrSourceExist(MrMedicine mrMedicine) {
-		MrMedicine mrMedicineDb = (MrMedicine) entityManager.createQuery(
-		        "from MrMedicine where medicinename = :medicinename and expirydate = :expirydate and mclass = :mclass and subClass = :subClass")
+		Long count = (Long) entityManager.createQuery(
+		        "SELECT  COUNT (*) from MrMedicine where medicinename = :medicinename and expirydate = :expirydate and mclass = :mclass and subClass = :subClass")
 				.setParameter("medicinename", mrMedicine.getMedicineName())
 				.setParameter("expirydate", mrMedicine.getExpiryDate())
 				.setParameter("mclass", mrMedicine.getmClass())
 				.setParameter("subClass", mrMedicine.getSubClass())
 		        .getSingleResult();
-		if(mrMedicineDb != null){
+		if(count>0){
+			MrMedicine mrMedicineDb = (MrMedicine) entityManager.createQuery(
+			        "from MrMedicine where medicinename = :medicinename and expirydate = :expirydate and mclass = :mclass and subClass = :subClass")
+					.setParameter("medicinename", mrMedicine.getMedicineName())
+					.setParameter("expirydate", mrMedicine.getExpiryDate())
+					.setParameter("mclass", mrMedicine.getmClass())
+					.setParameter("subClass", mrMedicine.getSubClass())
+			        .getSingleResult();
 			return mrMedicineDb;
 		}
 		return null;
 	}
 
-	public DoctorMedicine isDoctorMedicineExist(String medicineName, String doctor, String expirydate) {
-		DoctorMedicine doctorMedicine = (DoctorMedicine) entityManager.createQuery(
-		        "from medicine where doctor_username = :doctorusername and medicinename = :medicinename and expirydate = :expirydate")
-				.setParameter("doctorusername", doctor)
-				.setParameter("medicinename", medicineName)
-				.setParameter("expirydate", expirydate)
+	public DoctorMedicine isDoctorMedicineExist(MrMedicine mrMedicine, Doctor doctor) {
+		Long count = (Long) entityManager.createQuery(
+		        "SELECT  COUNT (*) from DoctorMedicine where doctor = :doctor and medicinename = :medicinename and expirydate = :expirydate and mclass = :mclass and subClass = :subClass")
+				.setParameter("doctor", doctor)
+				.setParameter("medicinename", mrMedicine.getMedicineName())
+				.setParameter("expirydate", mrMedicine.getExpiryDate())
+				.setParameter("mclass", mrMedicine.getmClass())
+				.setParameter("subClass", mrMedicine.getSubClass())
 		        .getSingleResult();
-		if(doctorMedicine != null){
+		if(count>0){
+			DoctorMedicine doctorMedicine = (DoctorMedicine) entityManager.createQuery(
+			    "from DoctorMedicine where doctor = :doctor and medicinename = :medicinename and expirydate = :expirydate and mclass = :mclass and subClass = :subClass")
+				.setParameter("doctor", doctor)
+				.setParameter("medicinename", mrMedicine.getMedicineName())
+				.setParameter("expirydate", mrMedicine.getExpiryDate())
+				.setParameter("mclass", mrMedicine.getmClass())
+				.setParameter("subClass", mrMedicine.getSubClass())
+		        .getSingleResult();
+			System.out.println("isDoctorMedicineExist");
 			return doctorMedicine;
 		}
 		return null;

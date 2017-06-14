@@ -541,14 +541,13 @@ public class UserController {
 	@ResponseBody
 	public Response addDoctorMedicineDetails(int id,String boxNum,String voucherNum,String couponNum,String medloc,String doctor,long loc) {
 		Response res = new Response();
-		System.out.println(loc);
 		MrMedicine mrMedicine = null;
 		DoctorMedicine doc = null;
 		Doctor docObj = userDao.getDoctor(doctor);
 		Location location = userDao.getLocation(loc);
 		try {
 			mrMedicine = docMedicineDao.getMrMedicineDetail(id);
-			doc  = docMedicineDao.isDoctorMedicineExist(mrMedicine.getMedicineName(),doctor,mrMedicine.getExpiryDate());
+			doc  = docMedicineDao.isDoctorMedicineExist(mrMedicine,docObj);
 			if(doc != null){
 				doc.setId(doc.getId());
 				if(boxNum!=null){
@@ -560,7 +559,9 @@ public class UserController {
 				if(couponNum!=null){
 					doc.setNumCoupons(String.valueOf((Integer.parseInt(voucherNum)+Integer.parseInt(doc.getNumCoupons()))));
 				}
-				docMedicineDao.updateMedicineDetails(doc);
+				ResponseString str = new ResponseString();
+				str.setResponse("Medicine Assigned Successfully!");
+				res.setObject(str);
 				res.setResponseCode("200");
 				return res;
 			}
