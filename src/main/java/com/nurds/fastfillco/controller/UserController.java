@@ -559,6 +559,7 @@ public class UserController {
 				if(couponNum!=null){
 					doc.setNumCoupons(String.valueOf((Integer.parseInt(voucherNum)+Integer.parseInt(doc.getNumCoupons()))));
 				}
+				docMedicineDao.updateMedicineDetails(doc);
 				ResponseString str = new ResponseString();
 				str.setResponse("Medicine Assigned Successfully!");
 				res.setObject(str);
@@ -724,12 +725,17 @@ public class UserController {
 		try {
 			MrMedicine isMrSourceExist  = docMedicineDao.isMrSourceExist(medicine);
 			if(isMrSourceExist != null){
-				medicineReq.setId(isMrSourceExist.getId());
+				/*medicineReq.setId(isMrSourceExist.getId());
 				if(medicine.getNumPillPerBox()!=null){
 					medicineReq.setNumPillPerBox(isMrSourceExist.getNumPillPerBox()+medicine.getNumPillPerBox());
 				}
-				updateMrMedicine(medicineReq);
+				if(medicine.getNumPillPerBox()!=null){
+					isMrSourceExist.setNumPillPerBox(String.valueOf((Integer.parseInt(medicine.getNumPillPerBox())+Integer.parseInt(isMrSourceExist.getNumPillPerBox()))));
+				}
+				docMedicineDao.updateMrMedicine(medicine);*/
 				res.setResponseCode("200");
+				res.setResponseCode("500");
+				res.setError("Medicine Already Exist!");
 				return res;
 			}
 			docMedicineDao.createMrMedicine(medicine);
@@ -750,7 +756,7 @@ public class UserController {
 		Response res = new Response();
 		MrMedicine medicine = null;
 		try {
-			medicine = docMedicineDao.updateMrMedicine(medicineReq);
+			medicine = docMedicineDao.updateMrMedicine(medicine);
 		}
 		catch (Exception ex) {
 			System.out.println(ex);

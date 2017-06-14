@@ -191,43 +191,43 @@ public class DoctorMedicineDao {
   private EntityManager entityManager;
 
 
-	public MrMedicine updateMrMedicine(DoctorMedicineRequest medicineReq) {
-		MrMedicine medicine = getMrMedicineDetail(medicineReq.getId());
-		if(medicine == null){
+	public MrMedicine updateMrMedicine(MrMedicine medicine) {
+		MrMedicine medicineDb = getMrMedicineDetail(medicine.getId());
+		if(medicineDb == null){
 			return null;
 		}
-		if(medicineReq.getCouponsExpiryDate()!=null){
-			medicine.setCouponsExpiryDate(medicineReq.getCouponsExpiryDate());
+		if(medicine.getCouponsExpiryDate()!=null){
+			medicineDb.setCouponsExpiryDate(medicine.getCouponsExpiryDate());
 		}
-		if(medicineReq.getExpiryDate()!=null){
-			medicine.setExpiryDate(medicineReq.getExpiryDate());
+		if(medicine.getExpiryDate()!=null){
+			medicineDb.setExpiryDate(medicine.getExpiryDate());
 		}
-		if(medicineReq.getmClass()!=null){
-			medicine.setmClass(medicineReq.getmClass());
+		if(medicine.getmClass()!=null){
+			medicineDb.setmClass(medicine.getmClass());
 		}
-		if(medicineReq.getMedicineName()!=null){
-			medicine.setMedicineName(medicineReq.getMedicineName());
+		if(medicine.getMedicineName()!=null){
+			medicineDb.setMedicineName(medicine.getMedicineName());
 		}
-		if(medicineReq.getNumPillPerBox()!=null){
-			medicine.setNumPillPerBox(medicineReq.getNumPillPerBox());
+		if(medicine.getNumPillPerBox()!=null){
+			medicineDb.setNumPillPerBox(medicine.getNumPillPerBox());
 		}
-		if(medicineReq.getSubClass()!=null){
-			medicine.setSubClass(medicineReq.getSubClass());
+		if(medicine.getSubClass()!=null){
+			medicineDb.setSubClass(medicine.getSubClass());
 		}
-		if(medicineReq.getVoucherExpiryDate()!=null){
-			medicine.setVoucherExpiryDate(medicineReq.getVoucherExpiryDate());
+		if(medicine.getVoucherExpiryDate()!=null){
+			medicineDb.setVoucherExpiryDate(medicine.getVoucherExpiryDate());
 		}
-		if(medicineReq.getVoucherInsurance()!=null){
-			medicine.setVoucherInsurance(medicineReq.getVoucherInsurance());
+		if(medicine.getVoucherInsurance()!=null){
+			medicineDb.setVoucherInsurance(medicine.getVoucherInsurance());
 		}
-		if(medicineReq.getDosage()!=null){
-			medicine.setDosage(medicineReq.getDosage());
+		if(medicine.getDosage()!=null){
+			medicineDb.setDosage(medicine.getDosage());
 		}
 		if(medicine.getCouponInsurance()!=null){
-			medicine.setCouponInsurance(medicine.getCouponInsurance());
+			medicineDb.setCouponInsurance(medicine.getCouponInsurance());
 		}
 		if(medicine.getVoucherPrice()!=null){
-			medicine.setVoucherPrice(medicineReq.getVoucherPrice());
+			medicineDb.setVoucherPrice(medicine.getVoucherPrice());
 		}
 		medicine = entityManager.merge(medicine);
 		return medicine;
