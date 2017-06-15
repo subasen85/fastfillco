@@ -1,18 +1,24 @@
 package com.nurds.fastfillco.controller;
 
 
+import java.util.Map;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class MainController {
 
-  @RequestMapping("/")
+  /*@RequestMapping("/")
   @ResponseBody
   public String index() {
     return "Proudly handcrafted by " +
         "Robin dhawan";
-  }
+  }*/
+
+	@RequestMapping("/")
+	public String index(Map<String, Object> model) {
+		return "welcome";
+	}
 
 }
