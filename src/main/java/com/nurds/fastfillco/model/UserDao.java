@@ -147,6 +147,13 @@ public class UserDao {
 	        .getSingleResult();
 	  }
   
+  public Admin getAdmin(String username) {
+	    return (Admin) entityManager.createQuery(
+	        "from Admin where LOWER(username) = :username ")
+	        .setParameter("username", username.toLowerCase())
+	        .getSingleResult();
+	  }
+  
   public Location getLocation(long id) {
 	    return (Location) entityManager.createQuery(
 	        "from Location where id = :id ")
@@ -206,7 +213,7 @@ public String passwordReset(String username, String newPassword, boolean isDocto
 		System.out.println("toEmail="+toEmail+";subject="+subject+";content="+content);
 		String sendgrid_apikey = env.getProperty("sendgrid_apikey");
 		SendGrid sendgrid = new SendGrid(sendgrid_apikey);
-		Email from = new Email("fastfillco@fastfillco.com");
+		Email from = new Email("doccloset@docloset.com");
 		Email to = new Email(toEmail);
 		Content msgContent = new Content("text/plain", content);
 		Mail mail = new Mail(from, subject, to, msgContent);
@@ -226,5 +233,35 @@ public String passwordReset(String username, String newPassword, boolean isDocto
 		}
 		return false;
 	}
+	
+	/* Admin Registration **/
+	 public void registerAdmin(Admin admin) {
+		  System.out.println(admin);
+		  Long count = (Long) entityManager.createQuery(
+			        "SELECT  COUNT (*) from Admin")
+			        .getSingleResult();
+		  if(count > 0){
+			  admin.setSuperadmin(false);
+			  admin.setStatus(false);
 
+		  }else{
+			  admin.setSuperadmin(true);
+			  admin.setStatus(true);
+		  }
+		System.out.println("count="+count);
+		entityManager.persist(admin);
+		
+		    return;
+		  }
+	 
+	 /* Admin Login **/
+	 public Admin loginAdmin(String username,String password) {
+		    return (Admin) entityManager.createQuery(
+		        "from Admin where LOWER(username) = :username and password = :password")
+		        .setParameter("username", username.toLowerCase())
+		        .setParameter("password", password)
+		        .getSingleResult();
+		  }
+	 
+	 
 } // class UserDao

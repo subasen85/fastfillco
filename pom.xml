@@ -12,10 +12,10 @@
   <name>fastfillco</name>
 
   <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.2.3.RELEASE</version>
-    <relativePath />
+  <groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.3.0.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
   </parent>
 
   <dependencies>

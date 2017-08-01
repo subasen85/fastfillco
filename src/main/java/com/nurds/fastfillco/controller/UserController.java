@@ -7,11 +7,14 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+
+import com.nurds.fastfillco.AdminDTO;
 import com.nurds.fastfillco.DoctorListResponse;
 import com.nurds.fastfillco.DoctorMedcineResponse;
 import com.nurds.fastfillco.DoctorMedicineRequest;
@@ -21,6 +24,7 @@ import com.nurds.fastfillco.MrMedcineResponse;
 import com.nurds.fastfillco.Response;
 import com.nurds.fastfillco.ResponseListStr;
 import com.nurds.fastfillco.ResponseString;
+import com.nurds.fastfillco.model.Admin;
 import com.nurds.fastfillco.model.Doctor;
 import com.nurds.fastfillco.model.DoctorMedicine;
 import com.nurds.fastfillco.model.DoctorMedicineDao;
@@ -32,6 +36,7 @@ import com.nurds.fastfillco.model.MedicalRep;
 import com.nurds.fastfillco.model.MrMedicine;
 import com.nurds.fastfillco.model.UserDao;
 
+@CrossOrigin
 @Controller
 public class UserController {
 
@@ -106,7 +111,7 @@ public class UserController {
 	
 	@RequestMapping(value="/getDoctorList")
 	@ResponseBody
-	public Response getDoctor(String username) {
+	public DoctorListResponse getDoctor(String username) {
 		Response res = new Response();
 		List<Doctor> doc = null;
 		try {
@@ -117,13 +122,13 @@ public class UserController {
 			System.out.println(ex);
 			res.setResponseCode("500");
 			res.setError("Login Failed");
-			return res;
+		//	return res;
 		}
 		res.setResponseCode("200");
 		DoctorListResponse list = new DoctorListResponse();
 		list.setDoctors(doc);
 		res.setObject(list);
-		return res;
+		return list;
 	}
 	
 	@RequestMapping(value="/getClasses")
@@ -810,16 +815,134 @@ public class UserController {
 	public Response forgotPasswordDoctor(String username,boolean isDoctor) {
 		Response res = new Response();
 		String  user = null;
-		SecureRandom random = new SecureRandom();
-		String newPassword=new BigInteger(50, random).toString(32);
+		String password= null;
+		Boolean isUsernameExist = false;
 		try {
-			user = userDao.passwordReset(username,newPassword, isDoctor);
-			if(user == null){
+			if(isDoctor){
+				Doctor doctor = userDao.getDoctor(username);
+				if(doctor!=null){
+					isUsernameExist = true;
+					password = doctor.getPassword();
+					user = doctor.getFirstName();
+					if(doctor.getLastName()!=null){
+						user = doctor.getFirstName()+" "+doctor.getLastName();	
+					}
+				}
+			}else{
+				MedicalRep medicalRep = userDao.getMr(username);
+				if(medicalRep!=null){
+					isUsernameExist = true;
+					password = medicalRep.getPassword();
+					user = medicalRep.getFirstName();
+					if(medicalRep.getLastName()!=null){
+						user = medicalRep.getFirstName()+" "+medicalRep.getLastName();	
+					}
+				}
+			}
+			if(!isUsernameExist){
 				res.setResponseCode("500");
-				res.setError("Problem in reset Password");
+				res.setError("Username not exist");
 				return res;
 			}
 		}
+		catch (Exception ex) {
+			System.out.println(ex);
+			res.setResponseCode("500");
+			res.setError("Problem in forgot Password");
+			return res;
+		}
+		try {
+			String content = "Hi "+user+", your DocCloset Password is '"+password+"',you can use this to login.";
+			boolean isPasswordMailSend = userDao.sendEmail(username,"Password Forgot,", content);
+			if(!isPasswordMailSend){
+				res.setResponseCode("500");
+				res.setError("Problem in sending mail");
+				return res;
+			}
+		}
+		catch (Exception ex) {
+			System.out.println(ex);
+			res.setResponseCode("500");
+			res.setError("Problem in getting Password");
+			return res;
+		}
+		res.setResponseCode("200");
+		res.setMessage("Your password mail send successfully!");
+		return res;
+	}
+	
+	@CrossOrigin
+	@RequestMapping(value="/registeradmin" , method = RequestMethod.POST)
+	@ResponseBody
+	public Response registerAdmin(@RequestBody AdminDTO adminDTO) {
+		System.out.println(adminDTO);
+		Admin admin = new Admin();
+		admin.setFirstName(adminDTO.getFirstName());
+		admin.setLastName(adminDTO.getLastName());
+		admin.setMobileNumber(adminDTO.getMobileNumber());
+		admin.setCity(adminDTO.getCity());
+		admin.setUsername(adminDTO.getUsername());
+		admin.setPassword(adminDTO.getPassword());
+		admin.setSuperadmin(adminDTO.getSuperadmin());
+
+		Response res = new Response();		
+		userDao.registerAdmin(admin);
+		res.setResponseCode("200");
+		res.setMessage("Registration completed successfully");
+		return res;
+	}
+	
+	@CrossOrigin
+	@RequestMapping(value="/loginadmin" , method = RequestMethod.POST)
+	@ResponseBody
+	public Response loginAdmin(@RequestBody AdminDTO adminDTO) {
+		System.out.println(("username::"+adminDTO.getUsername()+
+							"password::"+ adminDTO.getPassword()));
+		Response res = new Response();		
+		Admin admin = null;
+		try {
+
+			admin = userDao.loginAdmin(adminDTO.getUsername(), adminDTO.getPassword());
+		}
+		catch (Exception ex) {
+			System.out.println(ex);
+			res.setResponseCode("500");
+			res.setError("Login Failed");
+			return res;
+		}
+		res.setResponseCode("200");
+		res.setMessage("Login successfully");
+		res.setObject(admin);
+		return res;
+		
+	}
+
+	@CrossOrigin
+	@RequestMapping(value="/forgotPasswordAdmin", method = RequestMethod.POST)
+	@ResponseBody
+	public Response forgotPasswordAdmin(@RequestBody
+			AdminDTO adminDTO) {
+		System.out.println("username::"+adminDTO.getUsername());
+		Response res = new Response();
+		String  user = null;
+		String password= null;
+		Boolean isUsernameExist = false;
+			try {
+					Admin admin = userDao.getAdmin(adminDTO.getUsername());
+					if(admin!=null){
+						isUsernameExist = true;
+						password = admin.getPassword();
+						user = admin.getFirstName();
+						if(admin.getLastName()!=null){
+							user = admin.getFirstName()+" "+admin.getLastName();	
+						}
+					}
+					if(!isUsernameExist){
+						res.setResponseCode("500");
+						res.setError("Username not exist");
+						return res;
+					}
+			}
 		catch (Exception ex) {
 			System.out.println(ex);
 			res.setResponseCode("500");
@@ -827,8 +950,8 @@ public class UserController {
 			return res;
 		}
 		try {
-			String content = "Hi "+user+", your fastfillco Password has been reset,you can use this password='"+newPassword+"' to login.";
-			boolean isPasswordMailSend = userDao.sendEmail(username,"Password Reset,", content);
+			String content = "Hi "+user+", your Admin Password is '"+password+"',you can use this to login.";
+			boolean isPasswordMailSend = userDao.sendEmail(adminDTO.getUsername(),"Password Reset,", content);
 			if(!isPasswordMailSend){
 				res.setResponseCode("500");
 				res.setError("Problem in sending mail");
@@ -842,7 +965,7 @@ public class UserController {
 			return res;
 		}
 		res.setResponseCode("200");
-		res.setMessage("Your password reset mail send successfully!");
+		res.setMessage("Your password send to mail successfully!");
 		return res;
 	}
 } 
